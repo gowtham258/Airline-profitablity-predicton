@@ -64,7 +64,8 @@ Design more balanced and effective marketing strategies.
 
 Feel free to explore the files and insights provided in this repository. Contributions are welcome to enhance the project's performance and reach!
 
-
+prestantion video link below
+https://drive.google.com/file/d/1eM1cQ6H-U_uT2_InGgQ5HFT-iDC2rIDP/view?usp=sharing
 
 
 

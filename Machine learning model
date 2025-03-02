@@ -1,0 +1,259 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+# Cache the data loading for better performance
+@st.cache_data
+def load_data():
+    # Adjust the file path as needed
+    df = pd.read_csv("Aviation_KPIs_Dataset.xlsx - Sheet1.csv")
+    # Clean column names by stripping extra spaces
+    df.columns = df.columns.str.strip()
+    return df
+
+# Load the dataset
+df = load_data()
+
+st.title("Outlier Detection in Aviation KPIs")
+
+# Sidebar button to trigger the outlier detection process
+if st.sidebar.button("Run Outlier Detection"):
+    # --- Convert Time Features ---
+    # Convert Scheduled and Actual Departure Time to datetime format
+    df["Scheduled Departure Time"] = pd.to_datetime(df["Scheduled Departure Time"])
+    df["Actual Departure Time"] = pd.to_datetime(df["Actual Departure Time"])
+    
+    # Extract useful time features
+    df["Scheduled Hour"] = df["Scheduled Departure Time"].dt.hour
+    df["Actual Hour"] = df["Actual Departure Time"].dt.hour
+    df["Departure Delay"] = (df["Actual Departure Time"] - df["Scheduled Departure Time"]).dt.total_seconds() / 60  # in minutes
+    
+    # Drop the original time columns
+    df.drop(columns=["Scheduled Departure Time", "Actual Departure Time"], inplace=True)
+    
+    # --- Create Dummy Variables for 'Season' ---
+    # Assume that the dataset already has a 'Season' column
+    season_dummies = pd.get_dummies(df['Season'], prefix='Season', drop_first=True)
+    df = pd.concat([df, season_dummies], axis=1)
+    df.drop(columns=['Season'], inplace=True)
+    
+    # --- Define Outlier Detection Function ---
+    def detect_outliers_iqr(data, column):
+        Q1 = data[column].quantile(0.25)
+        Q3 = data[column].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        outliers = data[(data[column] < lower_bound) | (data[column] > upper_bound)]
+        return outliers
+
+    # --- Detect Outliers ---
+    outliers_profit = detect_outliers_iqr(df, "Profit (USD)")
+    outliers_delay = detect_outliers_iqr(df, "Delay (Minutes)")
+    
+    # --- Display Results ---
+    st.write("### Outliers in Profit (USD):")
+    st.dataframe(outliers_profit)
+    
+    st.write("### Outliers in Delay (Minutes):")
+    st.dataframe(outliers_delay)
+import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+from xgboost import XGBRegressor
+import pickle
+
+# ---------------------------
+# Data Loading Function (cached)
+# ---------------------------
+@st.cache_data
+def load_data():
+    # Adjust file path as needed
+    df = pd.read_csv("Aviation_KPIs_Dataset.xlsx - Sheet1.csv")
+    # Clean column names (remove extra spaces)
+    df.columns = df.columns.str.strip()
+    return df
+
+# Load data
+df = load_data()
+
+st.title("Airline Profit Prediction ML Pipeline")
+
+# Sidebar button to run the entire ML pipeline
+if st.sidebar.button("Run ML Pipeline"):
+    st.header("Running the Machine Learning Pipeline")
+    
+    # -------- Feature Scaling --------
+    # List of numeric columns to scale
+    num_cols = ["Delay (Minutes)", "Aircraft Utilization (Hours/Day)", "Turnaround Time (Minutes)",
+                "Load Factor (%)", "Fleet Availability (%)", "Maintenance Downtime (Hours)",
+                "Fuel Efficiency (ASK)", "Revenue (USD)", "Operating Cost (USD)", "Net Profit Margin (%)",
+                "Ancillary Revenue (USD)", "Debt-to-Equity Ratio", "Revenue per ASK", "Cost per ASK",
+                "Departure Delay", "Month", "Scheduled Month", "Scheduled Hour", "Actual Hour"]
+    
+    # Create a copy for scaling (in case original df is needed)
+    df_scaled = df.copy()
+    
+    # Initialize StandardScaler and scale the numeric features
+    scaler = StandardScaler()
+    try:
+        df_scaled[num_cols] = scaler.fit_transform(df_scaled[num_cols])
+    except Exception as e:
+        st.error(f"Error in scaling: {e}")
+    
+    # -------- Splitting Data --------
+    # Define features X and target y
+    # Dropping "Profit (USD)" (target) and "Flight Number" (identifier)
+    X = df_scaled.drop(columns=["Profit (USD)", "Flight Number"])
+    y = df_scaled["Profit (USD)"]
+    
+    # Split data: 80% train, 20% test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # -------- Model Training & Evaluation --------
+    results = {}
+    
+    # 1. Linear Regression
+    lr_model = LinearRegression()
+    lr_model.fit(X_train, y_train)
+    y_pred = lr_model.predict(X_test)
+    results["LinearRegression"] = {
+        "MAE": mean_absolute_error(y_test, y_pred),
+        "MSE": mean_squared_error(y_test, y_pred),
+        "RMSE": np.sqrt(mean_squared_error(y_test, y_pred)),
+        "R²": r2_score(y_test, y_pred)
+    }
+    
+    # 2. Ridge Regression
+    ridge_model = Ridge(alpha=1.0)
+    ridge_model.fit(X_train, y_train)
+    y_pred = ridge_model.predict(X_test)
+    results["Ridge"] = {
+        "MAE": mean_absolute_error(y_test, y_pred),
+        "MSE": mean_squared_error(y_test, y_pred),
+        "RMSE": np.sqrt(mean_squared_error(y_test, y_pred)),
+        "R²": r2_score(y_test, y_pred)
+    }
+    
+    # 3. Lasso Regression
+    lasso_model = Lasso(alpha=0.01)
+    lasso_model.fit(X_train, y_train)
+    y_pred = lasso_model.predict(X_test)
+    results["Lasso"] = {
+        "MAE": mean_absolute_error(y_test, y_pred),
+        "MSE": mean_squared_error(y_test, y_pred),
+        "RMSE": np.sqrt(mean_squared_error(y_test, y_pred)),
+        "R²": r2_score(y_test, y_pred)
+    }
+    
+    # 4. Decision Tree Regressor
+    dt_model = DecisionTreeRegressor(random_state=42)
+    dt_model.fit(X_train, y_train)
+    dt_pred = dt_model.predict(X_test)
+    results["Decision Tree"] = {
+        "MAE": mean_absolute_error(y_test, dt_pred),
+        "MSE": mean_squared_error(y_test, dt_pred),
+        "RMSE": np.sqrt(mean_squared_error(y_test, dt_pred)),
+        "R²": r2_score(y_test, dt_pred)
+    }
+    
+    # 5. Random Forest Regressor
+    rf_model = RandomForestRegressor(n_estimators=10, random_state=42, verbose=0)
+    rf_model.fit(X_train, y_train)
+    y_pred = rf_model.predict(X_test)
+    results["Random Forest"] = {
+        "MAE": mean_absolute_error(y_test, y_pred),
+        "MSE": mean_squared_error(y_test, y_pred),
+        "RMSE": np.sqrt(mean_squared_error(y_test, y_pred)),
+        "R²": r2_score(y_test, y_pred)
+    }
+    
+    # 6. Gradient Boosting Regressor
+    gbr_model = GradientBoostingRegressor(n_estimators=10, learning_rate=0.1, random_state=42)
+    gbr_model.fit(X_train, y_train)
+    y_pred = gbr_model.predict(X_test)
+    results["Gradient Boosting"] = {
+        "MAE": mean_absolute_error(y_test, y_pred),
+        "MSE": mean_squared_error(y_test, y_pred),
+        "RMSE": np.sqrt(mean_squared_error(y_test, y_pred)),
+        "R²": r2_score(y_test, y_pred)
+    }
+    
+    # 7. XGBoost Regressor
+    xgb_model = XGBRegressor(n_estimators=100, learning_rate=0.1, random_state=42)
+    xgb_model.fit(X_train, y_train)
+    xgb_pred = xgb_model.predict(X_test)
+    results["XGBoost"] = {
+        "MAE": mean_absolute_error(y_test, xgb_pred),
+        "MSE": mean_squared_error(y_test, xgb_pred),
+        "RMSE": np.sqrt(mean_squared_error(y_test, xgb_pred)),
+        "R²": r2_score(y_test, xgb_pred)
+    }
+    
+    # Display evaluation metrics for each model
+    st.subheader("Model Evaluation Metrics")
+    model_comparison = pd.DataFrame({
+        'Model': list(results.keys()),
+        'MAE': [results[m]["MAE"] for m in results],
+        'MSE': [results[m]["MSE"] for m in results],
+        'RMSE': [results[m]["RMSE"] for m in results],
+        'R²': [results[m]["R²"] for m in results]
+    })
+    
+    model_comparison = model_comparison.sort_values(by='R²', ascending=False)
+    st.dataframe(model_comparison)
+    
+    # Plot R² Score Comparison
+    st.subheader("R² Score Comparison")
+    fig_r2, ax_r2 = plt.subplots(figsize=(15, 5))
+    sns.barplot(x=model_comparison['Model'], y=model_comparison['R²'], palette='viridis', ax=ax_r2)
+    ax_r2.set_title('R² Score Comparison of Models')
+    ax_r2.set_ylabel('R² Score')
+    ax_r2.set_xlabel('Model')
+    ax_r2.set_ylim(0, 1)  # R² ranges between 0 and 1
+    st.pyplot(fig_r2)
+    
+    # Plot Actual vs. Predicted for XGBoost
+    st.subheader("XGBoost: Actual vs. Predicted Profit")
+    fig_scatter, ax_scatter = plt.subplots(figsize=(8, 6))
+    ax_scatter.scatter(y_test, xgb_pred, color='blue', alpha=0.5)
+    ax_scatter.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--')
+    ax_scatter.set_title('Actual vs. Predicted Profit (USD) - XGBoost')
+    ax_scatter.set_xlabel('Actual Profit (USD)')
+    ax_scatter.set_ylabel('Predicted Profit (USD)')
+    st.pyplot(fig_scatter)
+    
+    # -------- Hyperparameter Tuning with GridSearchCV --------
+    st.subheader("Hyperparameter Tuning for Gradient Boosting")
+    param_grid = {
+        "n_estimators": [50, 100, 200],
+        "learning_rate": [0.01, 0.1, 0.2],
+        "max_depth": [3, 5, 7]
+    }
+    grid_search = GridSearchCV(GradientBoostingRegressor(random_state=42),
+                               param_grid, cv=5, scoring="r2", n_jobs=-1)
+    grid_search.fit(X_train, y_train)
+    best_params = grid_search.best_params_
+    st.write("**Best Parameters:**", best_params)
+    
+    # -------- Save the Best Model (using Gradient Boosting here) --------
+    with open("airline_profit_model.pkl", "wb") as file:
+        pickle.dump(gbr_model, file)
+    st.success("Gradient Boosting Model saved successfully as 'airline_profit_model.pkl'")
+    
+    # -------- Load & Use the Saved Model for Prediction --------
+    with open("airline_profit_model.pkl", "rb") as file:
+        loaded_model = pickle.load(file)
+    new_data = [[30, 90, 80, 95, 3, 25, 0.78, 100000, 75000, 10, 0.85, 0.12, 20000, 0.8, 0.05] +
+                [0]* (len(X_train.columns) - 15)]  # Adjust new_data shape as needed
+    predicted_profit = loaded_model.predict(new_data)
+    st.write(f"**Predicted Profit:** ${predicted_profit[0]:,.2f}")

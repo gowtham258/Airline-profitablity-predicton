@@ -1,7 +1,7 @@
 ***Airline Profitability Prediction and Optimization***
 
 **Overview**:
-In the highly competitive airline industry, maximizing profitability requires balancing operational efficiency and cost management. Various factors influence a flight’s profitability, including operational metrics (flight delays, turnaround time, fleet availability), financial aspects (revenue, operating costs), and external influences (seasonal demand, fuel efficiency).
+   In the highly competitive airline industry, maximizing profitability requires balancing operational efficiency and cost management. Various factors influence a flight’s profitability, including operational metrics (flight delays, turnaround time, fleet availability), financial aspects (revenue, operating costs), and external influences (seasonal demand, fuel efficiency).
 This project aims to develop a machine learning model to accurately predict airline flight profitability (in USD) based on historical flight performance data. The model will help airline operators make data-driven decisions to optimize operations, reduce inefficiencies, and improve financial performance.
 
 **Objectives**:
@@ -35,21 +35,21 @@ The model will be trained using historical flight data with features such as:
     -Provide actionable insights to optimize airline operations.
 
 ***Technologies Used***:
--Programming Language: Python (for data cleaning, preprocessing, and machine learning).
--Visualization Tool: Streamlit(for interactive dashboards and analysis).
-Libraries:
--Data Analysis: Pandas, NumPy.
--Visualization: Matplotlib, Seaborn.
--Machine Learning: Scikit-learn, Imbalanced-learn.
--Synthetic Oversampling: SMOTE for handling class imbalance.
+ -Programming Language: Python (for data cleaning, preprocessing, and machine learning).
+ -Visualization Tool: Streamlit(for interactive dashboards and analysis).
+**Libraries**:
+ -Data Analysis: Pandas, NumPy.
+ -Visualization: Matplotlib, Seaborn.
+ -Machine Learning: Scikit-learn, Imbalanced-learn.
+ -Synthetic Oversampling: SMOTE for handling class imbalance.
 
 ***Future Scope***:
--Enhancing Model Accuracy: Improve predictions using deep learning techniques like LSTMs for time-series analysis.
--Real-Time Profitability Forecasting: Integrate live flight and financial data for dynamic predictions.
--Incorporating External Factors: Include fuel price trends, weather conditions, and competitor pricing for better insights.
--Optimization Recommendations: Develop AI-driven strategies for route planning, pricing, and cost reduction.
--Scalability & Automation: Expand the model for multi-airline analysis and automate decision-making.
--Dashboard & API Integration: Deploy a real-time analytics dashboard and integrate with airline management systems.
+ -Enhancing Model Accuracy: Improve predictions using deep learning techniques like LSTMs for time-series analysis.
+ -Real-Time Profitability Forecasting: Integrate live flight and financial data for dynamic predictions.
+ -Incorporating External Factors: Include fuel price trends, weather conditions, and competitor pricing for better insights.
+ -Optimization Recommendations: Develop AI-driven strategies for route planning, pricing, and cost reduction.
+ -Scalability & Automation: Expand the model for multi-airline analysis and automate decision-making.
+ -Dashboard & API Integration: Deploy a real-time analytics dashboard and integrate with airline management systems.
 
 
 Feel free to explore the files and insights provided in this repository. Contributions are welcome to enhance the project's performance and reach!

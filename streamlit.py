@@ -1,40 +1,4 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import streamlit as st
-import datetime as dt
-
-st.title("Aviation KPIs Dashboard")
-
-# Sample data loading (replace with your actual data loading mechanism)
-data = {
-    "Maintenance Downtime (Hours)": [5, 10, 3, 8, 6],
-    "Profit (USD)": [20000, 15000, 25000, 18000, 22000]
-}
-df = pd.DataFrame(data)
-
-# Create the figure and axis for the plot
-fig, ax = plt.subplots(figsize=(8, 6))
-sns.barplot(x="Maintenance Downtime (Hours)", y="Profit (USD)", data=df, ax=ax)
-ax.set_title("Maintenance Downtime vs. Profit")
-
-# Display the plot in the Streamlit app
-st.pyplot(fig)
-
-# Use Streamlit caching to speed up data loading
-@st.cache_data
-def load_data():
-    # Adjust the file path as needed. Ensure the CSV file is in your working directory.
-    df = pd.read_csv('Aviation_KPIs_Dataset.xlsx - Sheet1.csv')
-    # Clean column names by stripping extra spaces
-    df.columns = df.columns.str.strip()
-    return df
-
-# Load the data
-df = load_data()
-
-# Dashboard content continues...
+pip install matplotlib
 # pip install matplotlib
 import pandas as pd
 import numpy as np

@@ -1,5 +1,30 @@
+# {
+#  "cells": [
+#   {
+#    "cell_type": "code",
+#    "execution_count": null,
+#    "id": "6e698c40-de41-4e16-8742-919663d52923",
+#    "metadata": {},
+#    "outputs": [],
+#    "source": []
+#   }
+#  ],
+#  "metadata": {
+#   "kernelspec": {
+#    "display_name": "",
+#    "name": ""
+#   },
+#   "language_info": {
+#    "name": ""
+#   }
+#  },
+#  "nbformat": 4,
+#  "nbformat_minor": 5
+# }
+
 import pandas as pd
 import numpy as np
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 import streamlit as st
@@ -7,6 +32,10 @@ import datetime as dt
 st.title("Aviation KPIs Dashboard")
 df=pd.read_csv('Aviation_KPIs_Dataset.xlsx - Sheet1.csv')
 
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Sample data loading (replace with your actual data loading mechanism)
 # df = pd.read_csv("your_data.csv")
@@ -27,6 +56,99 @@ ax.set_title("Maintenance Downtime vs. Profit")
 
 # Display the plot in the Streamlit app
 st.pyplot(fig)
+
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load your data
+# df = pd.read_csv("your_data.csv")  # Adjust file path and separator if needed
+
+# Clean column names (remove extra spaces)
+# df.columns = df.columns.str.strip()
+
+# # Debug: Print column names to confirm
+# st.write("Columns in the dataset:")
+# st.write(df.columns.tolist())
+
+# ---------------------------
+# 1. Maintenance Downtime vs. Operating Cost
+# ---------------------------
+# st.header("Maintenance Downtime vs. Operating Cost")
+# fig1, ax1 = plt.subplots(figsize=(8, 6))
+# sns.scatterplot(x='Maintenance Downtime (Hours)', y='Operating Cost (USD)', data=df, ax=ax1)
+# ax1.set_title("Maintenance Downtime vs. Operating Cost")
+# st.pyplot(fig1)
+
+# ---------------------------
+# 2. Histogram of Delays
+# ---------------------------
+# st.header("Distribution of Delays")
+# fig2, ax2 = plt.subplots(figsize=(8, 6))
+# sns.histplot(df['Delay (Minutes)'], bins=20, kde=True, ax=ax2)
+# ax2.set_title("Distribution of Delays")
+# st.pyplot(fig2)
+
+# ---------------------------
+# 3. Operating Cost vs. Profit
+# ---------------------------
+# st.header("Operating Cost vs. Profit")
+# fig3, ax3 = plt.subplots(figsize=(8, 6))
+# sns.scatterplot(x='Operating Cost (USD)', y='Profit (USD)', data=df, ax=ax3)
+# ax3.set_title("Operating Cost vs. Profit")
+# ax3.set_xlabel("Operating Cost (USD)")
+# ax3.set_ylabel("Profit (USD)")
+# ax3.grid(True)
+# st.pyplot(fig3)
+
+# ---------------------------
+# 4. Fleet Availability vs. Profit
+# ---------------------------
+# st.header("Fleet Availability vs. Profit")
+# fig4, ax4 = plt.subplots(figsize=(8, 6))
+# sns.lineplot(x='Fleet Availability (%)', y='Profit (USD)', data=df, ax=ax4)
+# ax4.set_title("Fleet Availability vs. Profit")
+# st.pyplot(fig4)
+
+
+# import streamlit as st
+# import pandas as pd
+# import seaborn as sns
+# import matplotlib.pyplot as plt
+
+# # Load your data - adjust the file path as needed
+# # df = pd.read_csv("your_data.csv")  # Replace with your actual file path
+
+# # Set the title for your Streamlit app
+# st.title("Revenue vs. Profit Distribution")
+
+# # Create a Matplotlib figure and axis
+# fig, ax = plt.subplots(figsize=(10, 6))
+
+# # Create the scatter plot with Seaborn
+# sns.scatterplot(
+#     x=df["Revenue (USD)"],
+#     y=df["Profit (USD)"],
+#     hue=df["Profit (USD)"] > 0,    # This will color points green for profitable flights and red for non-profitable
+#     palette={True: "green", False: "red"},
+#     ax=ax
+# )
+
+# # Set the title and axis labels
+# ax.set_title("Revenue (USD) vs. Profit (USD) (Profitable vs. Non-Profitable Flights)")
+# ax.set_xlabel("Revenue (USD)")
+# ax.set_ylabel("Profit (USD)")
+
+# # Display the plot in the Streamlit app
+# st.pyplot(fig)
+
+
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 # Use Streamlit caching to speed up data loading
 @st.cache_data
 def load_data():
@@ -40,6 +162,7 @@ def load_data():
 df = load_data()
 
 # Set the title of the dashboard
+st.title("Aviation KPIs Dashboard")
 
 # Sidebar: Let the user choose which plot to display, including a "Select All" option
 plot_option = st.sidebar.selectbox(
@@ -48,8 +171,6 @@ plot_option = st.sidebar.selectbox(
         "Maintenance Downtime vs. Profit", 
         "Revenue vs. Profit Distribution",
         "Select All"
-        
-        
     ]
 )
 
@@ -77,6 +198,11 @@ if plot_option == "Revenue vs. Profit Distribution" or plot_option == "Select Al
     ax.set_ylabel("Profit (USD)")
     st.pyplot(fig)
 
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 # Load your data - update the file path as necessary
 df = pd.read_csv("Aviation_KPIs_Dataset.xlsx - Sheet1.csv")
 df.columns = df.columns.str.strip()  # Clean column names
@@ -93,6 +219,11 @@ ax.set_ylabel("Frequency")
 
 # Display the plot in the Streamlit app
 st.pyplot(fig)
+
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Load your data - adjust the file path as needed
 df = pd.read_csv("Aviation_KPIs_Dataset.xlsx - Sheet1.csv")
@@ -111,6 +242,12 @@ ax.set_title("Feature Correlation Heatmap")
 
 # Display the heatmap in the Streamlit app
 st.pyplot(fig)
+import streamlit as st
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 # Cache the data loading for performance
 @st.cache_data
 def load_data():
@@ -161,6 +298,11 @@ st.pyplot(fig2)
 
 # -----------------------------------
 
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Cache the data loading for better performance
 @st.cache_data
@@ -230,6 +372,11 @@ ax5.set_xlabel("Fuel Efficiency (Miles per Gallon)")
 ax5.set_ylabel("Profit (USD)")
 st.pyplot(fig5)
 
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 # Cache the data loading for improved performance
 @st.cache_data
 def load_data():
@@ -271,6 +418,10 @@ if st.button("Show Total Profit per Season"):
     
     # Display the plot in the Streamlit app
     st.pyplot(fig)
+import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Cache data loading for performance
 @st.cache_data
@@ -295,3 +446,20 @@ def load_data():
     }
     df["Season"] = df["Scheduled Month"].map(season_mapping)
     return df
+
+# Load the dataset
+df = load_data()
+
+# Set the title for the dashboard
+st.title("Profit Distribution by Season")
+
+# Add a button to the sidebar to show the plot
+if st.sidebar.button("Show Profit Distribution by Season"):
+    fig, ax = plt.subplots(figsize=(8, 5))
+    sns.boxplot(x=df["Season"], y=df["Profit (USD)"], palette="Set2", ax=ax)
+    ax.set_title("Profit Distribution Across Seasons")
+    ax.set_xlabel("Season")
+    ax.set_ylabel("Profit (USD)")
+    st.pyplot(fig)
+
+
